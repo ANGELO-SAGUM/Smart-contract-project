@@ -1,91 +1,44 @@
-# Smart Contract Project
+# Project Title
+
+Auction Contract
 
 ## Description
 
-This project demonstrates the implementation of error handling in Solidity smart contracts using require(), assert(), and revert() statements. The smart contract includes basic functions for depositing and withdrawing Ether, as well as examples of each error handling method. This project aims to provide a clear understanding of how to use these statements to ensure the security and correctness of smart contracts.
+This project provides an in-depth explanation of a simple auction contract, which facilitates a transparent and secure auction process. The contract allows users to place bids, and it keeps track of the highest bid and the corresponding bidder. The walkthrough video demonstrates how to use the contract, including placing bids, retrieving the highest bid, and handling multiple bids. This project is useful for anyone interested in learning about blockchain development, smart contracts, and their applications.
 
 ## Getting Started
 
 ### Installing
 
-To get started with this project, follow these steps:
-
-* Download the project repository from GitHub.
-* No modifications are needed to be made to files/folders.
+To get started with this project, you'll need to have Remix, a popular blockchain development environment, installed on your computer. You can download Remix from the official website.
 
 ### Executing program
 
-* Open the project in Remix IDE:
-  // Go to Remix IDE.
-  // Open the ErrorHandling.sol file in the Remix editor.
-* Compile the contract:
-  //In the Remix IDE, go to the "Solidity Compiler" tab. //Click "Compile ErrorHandling.sol".
-* Deploy the contract:
-  // Go to the "Deploy & Run Transactions" tab.
-  // Ensure the correct contract (ErrorHandling) is selected.
-  // Click "Deploy".
-* Interact with the contract:
-  // Use the deployed contract instance to call functions like deposit, withdraw, checkInvariant, and demoRevert.
-Example commands in Remix: 
-// Deposit 1 ether deposit({ value: web3.utils.toWei("1", "ether") })
+* How to run the program
+* Step-by-step bullets
+```
+Open Remix and create a new contract
+Copy and paste the auction contract code into the Remix editor
+Compile the contract
+Deploy the contract to the blockchain
+Interact with the contract using the Remix interface
 
-// Withdraw 0.5 ether withdraw(web3.utils.toWei("0.5", "ether"))
+```
 
-// Check invariant checkInvariant()
-
-// Trigger revert example demoRevert()
 ## Help
 
-For common problems or issues:
-
-// Ensure you have enough Ether in your account for transactions.
-// Verify the correct contract address if interacting through external scripts.
-// Check the Remix console for detailed error messages and stack traces.
-## To get more information on using Remix IDE
-```remix.help()```
+If you encounter any issues while following the walkthrough, you can refer to the Remix documentation or seek help from online blockchain development communities.
+```
+remix --help
+```
 
 ## Authors
+
+Contributors names and contact info
 
 John Angelo Sagum
 https://github.com/ANGELO-SAGUM
 
-
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details
-
-Here is the Solidity code for the ErrorHandling contract:
-```solidity
-pragma solidity 0.8.18;
-
-contract ErrorHandling {
-    mapping(address => uint256) public balances;
-
-    // Function to deposit Ether
-    function deposit() public payable {
-        require(msg.value > 0, "Deposit amount must be greater than 0");
-        balances[msg.sender] += msg.value;
-    }
-
-    // Function to withdraw Ether
-    function withdraw(uint256 _amount) public {
-        require(_amount > 0, "Withdrawal amount must be greater than 0");
-        require(balances[msg.sender] >= _amount, "Insufficient balance");
-        balances[msg.sender] -= _amount;
-        payable(msg.sender).transfer(_amount);
-    }
-
-    // Function to demonstrate assert statement
-    function checkInvariant() public pure {
-        uint256 x = 5;
-        assert(x == 5);
-    }
-
-    // Function to demonstrate revert statement
-    function demoRevert() public pure {
-        revert("Revert example");
-    }
-}
-
-
-
+This project is licensed under the John Angelo Sagum License - see the LICENSE.md file for details
