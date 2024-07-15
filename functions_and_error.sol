@@ -1,57 +1,41 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.18;
+
+pragma solidity ^0.8.0;
 
 contract ATM {
-    struct Account {
+    struct Vehicle {
         address owner;
-        uint balance;
+        uint tollBalance;
     }
 
-    mapping(string => Account) public accounts;
+    mapping (string => Vehicle) public vehicles;
 
-    constructor() {
+    event TollGatePassed(string vehicle);
+
+    function registerVehicle(string memory _vehicle, address _owner) public {
+        require(vehicles[_vehicle].owner == address(0), "Vehicle already exists");
+        vehicles[_vehicle].owner = _owner;
+        vehicles[_vehicle].tollBalance = 0;
     }
 
-    function withdraw(string memory _account, uint _amount) public {
-        require(accounts[_account].owner == msg.sender, "Only the account owner can withdraw");
-        require(accounts[_account].balance >= _amount, "Insufficient balance");
-
-        accounts[_account].balance -= _amount;
-
-        assert(accounts[_account].balance >= 0); // Check that balance is not negative
-
-        emit Withdrawal(_account, _amount);
+    function depositToll(string memory _vehicle, uint _amount) public {
+        require(vehicles[_vehicle].owner!= address(0), "Vehicle does not exist");
+        vehicles[_vehicle].tollBalance += _amount;
     }
 
-    function deposit(string memory _account, uint _amount) public {
-        require(accounts[_account].owner == msg.sender, "Only the account owner can deposit");
+    function passThroughTollGate(string memory _vehicle) public {
+        require(vehicles[_vehicle].owner!= address(0), "Vehicle does not exist");
+        require(vehicles[_vehicle].tollBalance >= 10, "Toll balance must be at least 10");
 
-        accounts[_account].balance += _amount;
+        assert(vehicles[_vehicle].tollBalance >= 10);
 
-        assert(accounts[_account].balance >= 0); // Check that balance is not negative
+        vehicles[_vehicle].tollBalance -= 10;
 
-        emit Deposit(_account, _amount);
+        emit TollGatePassed(_vehicle);
     }
 
-    function getBalance(string memory _account) public view returns (uint) {
-        require(accounts[_account].owner != address(0), "Account does not exist");
-
-        return accounts[_account].balance;
+    function checkTollBalance(string memory _vehicle) public view returns (uint) {
+        require(vehicles[_vehicle].owner!= address(0), "Vehicle does not exist");
+        return vehicles[_vehicle].tollBalance;
     }
-
-    function createAccount(string memory _account) public {
-        require(accounts[_account].owner == address(0), "Account already exists");
-
-        accounts[_account].owner = msg.sender;
-
-        accounts[_account].balance = 0;
-
-        assert(accounts[_account].owner != address(0)); // Check that account owner is not zero
-
-        emit AccountCreated(_account);
-    }
-
-    event Withdrawal(string indexed _account, uint _amount);
-    event Deposit(string indexed _account, uint _amount);
-    event AccountCreated(string indexed _account);
 }
