@@ -1,84 +1,57 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.18;
 
-contract AuctionContract {
-    address public owner;
-    uint256 public highestBid;
-    mapping(address => uint256) public bids;
-    bool public auctionEnded;
-
-    // Event emitted when a new bid is placed
-    event NewBid(address bidder, uint256 amount);
-
-    // Event emitted when the auction is ended
-    event AuctionEnded(address winner, uint256 highestBid);
-
-    // Modifier to check if the auction has ended
-    modifier onlyBeforeAuctionEnd {
-        require(!auctionEnded, "Auction has already ended");
-        _;
+contract ATM {
+    struct Account {
+        address owner;
+        uint balance;
     }
 
-    // Modifier to check if the caller is the owner
-    modifier onlyOwner {
-        require(msg.sender == owner, "Only the owner can call this function");
-        _;
-    }
+    mapping(string => Account) public accounts;
 
-    // Constructor to set the owner
     constructor() {
-        owner = msg.sender;
     }
 
-    // Function to place a bid
-    function placeBid(uint256 _amount) public onlyBeforeAuctionEnd {
-        // Require the bid to be higher than the current highest bid
-        require(_amount > highestBid, "Bid must be higher than the current highest bid");
+    function withdraw(string memory _account, uint _amount) public {
+        require(accounts[_account].owner == msg.sender, "Only the account owner can withdraw");
+        require(accounts[_account].balance >= _amount, "Insufficient balance");
 
-        // Update the highest bid and bidder
-        highestBid = _amount;
-        bids[msg.sender] = _amount;
+        accounts[_account].balance -= _amount;
 
-        // Emit the NewBid event
-        emit NewBid(msg.sender, _amount);
+        assert(accounts[_account].balance >= 0); // Check that balance is not negative
+
+        emit Withdrawal(_account, _amount);
     }
 
-    // Function to end the auction
-    function endAuction() public onlyOwner {
-        // Require the auction to not have ended already
-        require(!auctionEnded, "Auction has already ended");
+    function deposit(string memory _account, uint _amount) public {
+        require(accounts[_account].owner == msg.sender, "Only the account owner can deposit");
 
-        // Set the auction ended flag to true
-        auctionEnded = true;
+        accounts[_account].balance += _amount;
 
-        // Emit the AuctionEnded event
-        emit AuctionEnded(owner, highestBid);
+        assert(accounts[_account].balance >= 0); // Check that balance is not negative
+
+        emit Deposit(_account, _amount);
     }
 
-    // Function to demonstrate assert statement
-    function assertExample(uint256 _value) public pure returns (uint256) {
-        // Assert that the value is a multiple of 3
-        assert(_value % 3 == 0);
-        return _value;
+    function getBalance(string memory _account) public view returns (uint) {
+        require(accounts[_account].owner != address(0), "Account does not exist");
+
+        return accounts[_account].balance;
     }
 
-    // Function to demonstrate revert statement
-    function revertExample(uint256 _value) public pure returns (uint256) {
-        // Revert if the value is zero
-        if (_value == 0) {
-            revert("Value cannot be zero");
-        }
-        return _value;
+    function createAccount(string memory _account) public {
+        require(accounts[_account].owner == address(0), "Account already exists");
+
+        accounts[_account].owner = msg.sender;
+
+        accounts[_account].balance = 0;
+
+        assert(accounts[_account].owner != address(0)); // Check that account owner is not zero
+
+        emit AccountCreated(_account);
     }
 
-    // Function to demonstrate custom error
-    error InvalidBidder(address bidder);
-
-    function getBidderBid(address _bidder) public view returns (uint256) {
-        uint256 bid = bids[_bidder];
-        if (bid == 0) {
-            revert InvalidBidder(_bidder);
-        }
-        return bid;
-    }
+    event Withdrawal(string indexed _account, uint _amount);
+    event Deposit(string indexed _account, uint _amount);
+    event AccountCreated(string indexed _account);
 }
